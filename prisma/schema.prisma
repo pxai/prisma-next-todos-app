@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite" // env("PROVIDER")
+  url      = "file:./dev.db" // env("DATABASE_URL")
+}
+
+// schema
+// Notes:
+// To migrate the schema to a db:
+//    npx prisma db push
+// To run the administrator
+//    npx prisma studio
+// Before you access fron Next.js use
+//    npm install @prisma/client
+// Then run (and also Everytime you change the schema:)
+//    npx prisma db push
+//    npx prisma generate
+// Then restart the server!!
+
+model Post {
+  id        String     @default(cuid()) @id
+  title     String
+  content   String?
+  published Boolean @default(false)
+  author    User?   @relation(fields: [authorId], references: [id])
+  authorId  String?
+}
+
+model Todo {
+  id        String     @default(cuid()) @id
+  title     String
+  completed Boolean @default(false)
+  author    User?   @relation(fields: [authorId], references: [id])
+  authorId  String?
+}
+
+model User {
+  id            String       @default(cuid()) @id
+  name          String?
+  email         String?   @unique
+  createdAt     DateTime  @default(now()) @map(name: "created_at")
+  updatedAt     DateTime  @updatedAt @map(name: "updated_at")
+  posts         Post[]
+  todos         Todo[]
+  @@map(name: "users")
+}
